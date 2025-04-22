@@ -1,0 +1,125 @@
+    const callAPIExportCV = async (requestDataTest: RequestProfileDataSelectedExportCV,filePPTX?: File | null) => {
+        try {
+            const requestData: any = {
+                templateCV: 'BBVC-H',
+                employeeName: 'Thanawich Klongsard (Jeep)',
+                jobTitle: 'Technical Consultant',
+                jobDescription: 'is a Technical Consultant specializing in Golang and Java Spring Boot, with extensive experience in designing and building scalable backend systems. Proficient in developing APIs, integrating services, and optimizing system performance to ensure reliability and efficiency.',
+                projectList: [{ // previousProjectList
+                    customer: 'Thailand’s Leading Bank',
+                    projectName: 'SCB CardX-Thaid',
+                    role: 'Backend Developer',
+                    description: 'Development Backend Java Spring Reactive EKYC integrate with the ThaiD verification system'
+                },
+                {
+                    customer: 'Top FinTech Company',
+                    projectName: 'Digital Lending Platform',
+                    role: 'Lead Engineer',
+                    description: 'Designed microservices architecture and optimized API performance'
+                }],
+                educationList: [{ // educationList
+                    degree: 'Bachelors',
+                    faculty: 'Computer Science',
+                    universityName: 'Kasetsart University'
+                }],
+                skillList: [{ // educationList
+                    degree: 'Bachelors',
+                    faculty: 'Computer Science',
+                    universityName: 'Kasetsart University'
+                }],
+                profilePicture: '/9j/4AAQSkZJRgABAQEAYABgAAD/2wBDAAMCAgMCAgMDAwMEAwMEBQgFBQQEBQoHBwYIDAoMDAsKCwsNDhIQDQ4RDgsLEBYQERMUFRUVDA8XGBYUGBIUFRT/2wBDAQMEBAUEBQkFBQkUDQsNFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBT/wAARCAAwADADASIAAhEBAxEB/8QAHwAAAQUBAQEBAQEAAAAAAAAAAAECAwQFBgcICQoL/8QAtRAAAgEDAwIEAwUFBAQAAAF9AQIDAAQRBRIhMUEGE1FhByJxFDKBkaEII0KxwRVS0fAkM2JyggkKFhcYGRolJicoKSo0NTY3ODk6Q0RFRkdISUpTVFVWV1hZWmNkZWZnaGlqc3R1dnd4eXqDhIWGh4iJipKTlJWWl5iZmqKjpKWmp6ipqrKztLW2t7i5usLDxMXGx8jJytLT1NXW19jZ2uHi4+Tl5ufo6erx8vP09fb3+Pn6/8QAHwEAAwEBAQEBAQEBAQAAAAAAAAECAwQFBgcICQoL/8QAtREAAgECBAQDBAcFBAQAAQJ3AAECAxEEBSExBhJBUQdhcRMiMoEIFEKRobHBCSMzUvAVYnLRChYkNOEl8RcYGRomJygpKjU2Nzg5OkNERUZHSElKU1RVVldYWVpjZGVmZ2hpanN0dXZ3eHl6goOEhYaHiImKkpOUlZaXmJmaoqOkpaanqKmqsrO0tba3uLm6wsPExcbHyMnK0tPU1dbX2Nna4uPk5ebn6Onq8vP09fb3+Pn6/9oADAMBAAIRAxEAPwD4B8aXfibSvEeqrNfanbwi7lCk3Em0DeeM5rn28Ra7jjWdR/8AAp/8a+1dU+GNhqU1y9lsad5sPC5DxPl8MPbqe9VPhd+yJZfGCz1KOfTrvw/qEEMkwNlGsok2gHv0B9eB7121aEIW5JHiQxkr2lH7v8v+HPi6TxPry9dZ1H8LqT/GoD4q1/treo/+Bcn+Ne4ftQ/st6x+zX4i0/TtU1C11W21KE3Fle2gISZAcHg8qwOAQfUYyOa8Ins2jbDKVJGRkdvWuNqzsz1YVOZEv/CW6/8A9BrUf/AuT/GtTwr4p1ybxRo8cmsaiyPeQqym6kwQXGR1rE+wzeR5+xvJ3+X5mDt3Yztz645xWj4ThI8VaMeP+P2H/wBDFI2P05t/2d9Ni8TWOtaB4ssGuHnEt5Ym58iaMnmT5HwWxk45OfSsvXtY+IXwWVra+8OXL2skXGoW42ZzypLAbHBUA44NetXvjjwb4nlYRyvcX2Wjh+0QfPIAVC5JByQFLZyO/PIFcX4ms/CWqra29j4j1SGN2Lx2lgxlUuFbLFM/wqOMLkjA6nNfGwzHGUHb4tfXt/XU+iq4DB4m8pwcNO39foeEftA+KrH40HRNTv7jzba3gNusc0PyQNuBYgsw6gYxgH5TXzre/Cxb7Rby50nVreZI75lg0+QYkMe3IYN128kehINfanxP1KXxel1pWqrZzWlkiJJqUumJZPNEyiRZ5I8DLKiyEEjJ4r5RtL6O01ZgJfMQuQXYYzk46duvSu6OY1atWVaUWr/Z9Dy6mCo0KUaNKalbXmWu+up5pq3w71zQbGaTUtFvrPYYn86VCqbHUlSMj5g3BDKcYHuKo+E4Hh8T6UVGCbqJTkA8bx6190/Cb48+KPFXijT/AIS6vaWup+DNTtzaTRzRojJGIzyJWxsZQhXJOCM9zXT+Mf2CfhxoXj/SoND8fvpM1xiW30q/g+0SM6E5HmLjhiBj5See9exDExm0rbq5ywov2aldXbat6W1+d9PQ8su/2pfGI+I9/a6DqOgeF9Kk8+OGO80iQxyJvXK7VzvbPIIHAzWXffG3xPaeL21qfXtFLzkzn7B4cuLRZGkjPEbONqjOc564OM5rxL4j6t4iutcaS1sNSneJniWR4JH2jzM/LxxwBUQu/Emq6RoVtfafdSKs8Mk3mQOMYmfgrjGMY7DrnvXkwwCUF7qW/n+h3VsWruMZNx0+f4s7rwo+q22uanNf6hLeQTWF1qdzI0ZUlBbyIVk3dWJkwCPrXnCXguJo5ZPlRckt2JPOK7y2i1KXTPF8j2l59mljttPjB+VJELGSX5PvE4RRlRjHBOTiuFbSNUu7kTS2N62VAK+QwHHTjFHspJ+9ucaqJq6NPxNG8Fm9xca3aW72lvuWxaFbn7RI27EbbW+U7QDlhgE+oqDwz8SPE994/wBN1W48USyamJLUrfy8udhVVGcZBAAAIHOBn1qLxppniDVjG1xp0wimitwzQwlyEjBSMDb9043McjOetc/4V8JanB4q0wvp9+tvHdRnzHt2zgMMEjFepQivZxTX9f8ADmc0rs//2Q==',
+                workExperience: '5 year 1 mons'
+            }
+
+
+            //เกี่ยวกับข้อมูลไม่ครบ
+            const formData = new FormData();
+            formData.append("templateCV", requestData.templateCV ?? "");
+            formData.append("employeeName", requestData.employeeName ?? "");
+            formData.append("jobTitle", requestData.jobTitle ?? "");
+            formData.append("jobDescription", requestData.jobDescription ?? "");
+            formData.append("workExperience", requestData.workExperience ?? "0 year 0 mons");
+            if (!requestData.projectList || requestData.projectList.length === 0) {
+                formData.append("projectList[0].customer", "");
+                formData.append("projectList[0].projectName", "");
+                formData.append("projectList[0].role", "");
+                formData.append("projectList[0].description", "");
+            } else {
+                requestData.projectList.forEach((item, index) => {
+                    formData.append(`projectList[${index}].customer`, item.customer ?? "");
+                    formData.append(`projectList[${index}].projectName`, item.projectName ?? "");
+                    formData.append(`projectList[${index}].role`, item.role ?? "");
+                    formData.append(`projectList[${index}].description`, item.description ?? "");
+                });
+            }
+            if (!requestData.workExperienceList || requestData.workExperienceList.length === 0) {
+                formData.append("workExperienceList[0].jobTitle", "Technical Consultant");
+                formData.append("workExperienceList[0].company", "MFEC");
+                formData.append("workExperienceList[0].workStartDate", "12/01/2025");
+                formData.append("workExperienceList[0].workEndDate", "12/05/2026");
+            } else {
+                requestData.workExperienceList.forEach((item, index) => {
+                    formData.append(`workExperienceList[${index}].jobTitle`, item.jobTitle ?? "");
+                    formData.append(`workExperienceList[${index}].company`, item.company ?? "");
+                });
+            }
+            if (!requestData.educationList || requestData.educationList.length === 0) {
+                formData.append(`educationList[0].degree`, "");
+                formData.append(`educationList[0].faculty`, "");
+                formData.append(`educationList[0].universityName`, "");
+            } else {
+                requestData.educationList.forEach((item, index) => {
+                    formData.append(`educationList[${index}].degree`, item.degree ?? "");
+                    formData.append(`educationList[${index}].faculty`, item.faculty ?? "");
+                    formData.append(`educationList[${index}].universityName`, item.universityName ?? "");
+                })
+            }
+            // if (!requestData.skillList || requestData.skillList.length === 0) {
+            //     formData.append(`skillList[0].skillName`, "");
+            //     formData.append(`skillList[0].typeOfSkill`, "");
+            //     formData.append(`skillList[0].skillLevelId`, "");
+            // } else {
+            //     requestData.skillList.forEach((item, index) => {
+            //         formData.append(`skillList[${index}].skillName`, item.skillName ?? "");
+            //         formData.append(`skillList[${index}].typeOfSkill`, item.typeOfSkill ?? "");
+            //         formData.append(`skillList[${index}].skillLevelId`, item.skillLevelId ?? "");
+            //     })
+            // }
+            if (requestData.profilePicture) {
+                formData.append("profilePicture", requestData.profilePicture);
+            }
+
+            if (filePPTX) {
+                formData.append("imageFilePath", filePPTX);
+            }
+            formData.forEach((value, key) => {
+                console.log(`${key}:`, value);
+            });
+            const response = await useMyProfileState.exportUserCVHorizontal(formData);
+            // console.log("CV base 64", response.base64Cv);
+            const mimeType = "application/vnd.openxmlformats-officedocument.presentationml.presentation"
+            const fileName = `${requestData.employeeName}_CV_${requestData.templateCV}.pptx`.toLocaleLowerCase();
+            // const filePPTXdecode = decodeBase64ToFile(`data:${mimeType}; base64,${response.base64Cv}`, fileName);
+            //download file
+
+            console.log(response instanceof Blob)
+
+            // const pptBlob = new Blob(response, {
+            //     type: mimeType
+            // });
+
+            const url = window.URL.createObjectURL(response)
+
+            // const url = window.URL.createObjectURL(pptBlob);
+            console.log('ww')
+            const link = document.createElement("a");
+            link.href = url;
+            link.setAttribute("download", fileName);
+            document.body.appendChild(link);
+            link.click();
+            link.parentNode?.removeChild(link);
+
+        } catch (error) {
+            console.error("Error cannot export CV:", error);
+        }
+    }
