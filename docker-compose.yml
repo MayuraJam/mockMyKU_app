@@ -1,0 +1,32 @@
+# version: "3.8"
+
+services:
+  mongodb:
+    image: mongo
+    container_name: mongodb_container
+    ports:
+      - "27017:27017"
+    networks:
+      - mynet
+    volumes:
+      - mongo_db:/data/db
+
+  app:
+    build: .
+    container_name: myku-app-container
+    ports:
+      - "3000:3000"
+    # environment:
+    #   - MONGO_URI=mongodb://mongo_db:27017/myKUDB
+    #   # - .env
+    env_file:
+      - .env 
+    depends_on:
+      - mongodb
+    networks:
+      - mynet
+
+networks:
+  mynet:
+volumes:
+  mongo_db: {}
