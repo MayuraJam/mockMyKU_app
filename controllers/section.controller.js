@@ -1,0 +1,222 @@
+const SectionModal = require("../model/section.modal");
+
+const getSection = async (req, res) => {
+  try {
+    const response = await SectionModal.find(); //แสดงข้อมูล
+    if (response.length === 0) {
+      console.log("Data not found");
+      return res.status(404).json({ massage: "get section not found" });
+    } else {
+      res.json(response);
+      console.log("data fetch:", response);
+    }
+  } catch (error) {
+    res.status(500).json({ massage: "get section not found" });
+  }
+};
+
+const viewSection = async (req, res) => {
+  const { id } = req.params;
+  try {
+    const response = await SectionModal.findById(id);
+    if (response.length === 0) {
+      return res.status(404).json({ massage: "get section not found" });
+    }
+    res.status(200).json({ response });
+  } catch (error) {
+    console.error("❌ ERROR at //viewSection/ :", error.message || error);
+    res.status(500).json({
+      error: error.message || error,
+    });
+  }
+};
+
+const viewSectionByFilter = async (req, res) => {
+  try {
+    const query = {};
+    if (req.body.subject_id) query.subject_id = req.body.subject_id;
+    if (req.body.semester) query.semester = req.body.semester;
+    if (req.body.program) query.program = req.body.program;
+
+    const response = await SectionModal.find(query);
+    if (response.length === 0) {
+      return res.status(404).json({ massage: "get section not found" });
+    }
+    res.status(200).json({ response });
+  } catch (error) {
+    console.error("❌ ERROR at //viewSection/ :", error.message || error);
+    res.status(500).json({
+      error: error.message || error,
+    });
+  }
+};
+
+const createSection = async (req, res) => {
+  try {
+    //สร้างรหัสวิชา เลือกจากหน้าบ้าน => ได้เป็นหมายเลขออกมาประกอบกัน
+    // const newData = await SubjectModal.create(req.body); //create new sunject service
+    const newData = new SectionModal();
+    const requestBody = req.body;
+    newData.subject_id = requestBody.subject_id;
+    newData.Instructors_id = requestBody.Instructors_id;
+    newData.roomNumber = requestBody.roomNumber;
+    newData.limitCount = requestBody.limitCount;
+    newData.semester = requestBody.semester;
+    newData.program = requestBody.program;
+    newData.actionStatus = requestBody.actionStatus;
+    newData.createDate = new Date();
+    newData.updateDate = new Date();
+    newData.member = requestBody.member;
+    newData.timeSchedule = requestBody.timeSchedule;
+    newData.major = requestBody.major;
+
+    await newData.save();
+    res.status(200).json({ newData });
+  } catch (error) {
+    console.error("❌ ERROR at /createSection:", error.message || error);
+
+    res.status(500).json({
+      message: "create new Section fail",
+      error: error.message || error,
+    });
+  }
+};
+
+const updateSection = async (req, res) => {
+  const { id } = req.params;
+  try {
+    const requestBody = req.body;
+    const updateData = await SectionModal.findByIdAndUpdate(
+      id,
+      {
+        subject_id: requestBody.subject_id,
+        Instructors_id: requestBody.Instructors_id,
+        roomNumber: requestBody.roomNumber,
+        limitCount: requestBody.limitCount,
+        semester: requestBody.semester,
+        program: requestBody.program,
+        actionStatus: requestBody.actionStatus,
+        timeSchedule: requestBody.timeSchedule,
+        member: requestBody.member,
+        // major : requestBody.major,
+        updateDate: new Date(),
+      },
+      {
+        new: true,
+        runValidators: true,
+      }
+    );
+
+    if (!updateData) {
+      return res.status(404).json({ massage: `update Section fail ${id}` });
+    }
+    //ดึงข้อมูลที่อัปเดตใหม่
+    const getUpdateData = await SectionModal.findById(id);
+    res.status(200).json(getUpdateData);
+  } catch (error) {
+    console.error("❌ ERROR at /updateSection :", error.message || error);
+    res.status(500).json({
+      massage: error.message || error,
+    });
+  }
+};
+
+const addSectionMajor = async (req, res) => {
+  const { id } = req.params;
+
+  try {
+    const getSection = await SectionModal.findById(id);
+    if (!getSection) {
+      return res
+        .status(404)
+        .json({ massage: `this Section is not found to add` });
+    }
+    const foundData = getSection.major.some(
+      (major) =>
+        major.major_id.toString() === req.body.major_id &&
+        major.level.toString() === req.body.level
+    );
+    if (foundData) {
+      return res.status(500).json({
+        message: `Major data to add found in this Section`,
+      });
+    }
+    await SectionModal.findByIdAndUpdate(id, {
+      $push: {
+        major: { major_id: req.body.major_id, level: req.body.level },
+      },
+    });
+    res.status(200).json({
+      massage: `add Section major successfully`,
+    });
+  } catch (error) {
+    console.error("❌ ERROR at /addSectionMajor :", error.message || error);
+    res.status(500).json({
+      massage: error.message || error,
+    });
+  }
+};
+
+const deleteSection = async (req, res) => {
+  const { id } = req.params;
+  try {
+    const subject = await SectionModal.findByIdAndDelete(id);
+    if (!subject) {
+      return res
+        .status(404)
+        .json({ massage: `this ${id} not found to delete` });
+    }
+    res.status(200).json({ massage: `delete Section id : ${id} successfully` });
+  } catch (error) {
+    console.error("❌ ERROR at /deleteSection :", error.message || error);
+    res.status(500).json({
+      massage: error.message || error,
+    });
+  }
+};
+
+const removeSectionMajor = async (req, res) => {
+  const { id } = req.params;
+  const majorIdToRemove = req.body._id;
+  try {
+    const getSectionMajor = await SectionModal.findById(id);
+    if (!getSectionMajor) {
+      return res.status(404).json({ massage: `this section is not found` });
+    }
+    console.log("get section data  :", getSectionMajor);
+
+    const foundMajorId = getSectionMajor.major.some(
+      (major) => major._id.toString() === majorIdToRemove
+    );
+    console.log("found major id to remove :", foundMajorId);
+    if (!foundMajorId) {
+      return res.status(404).json({
+        message: `Major id: ${majorIdToRemove} not found in this Section`,
+      });
+    }
+    await SectionModal.findByIdAndUpdate(id, {
+      $pull: {
+        major: { _id: majorIdToRemove },
+      },
+    });
+    res.status(200).json({
+      massage: `delete Section major id : ${majorIdToRemove} successfully`,
+    });
+  } catch (error) {
+    console.error("❌ ERROR at /deleteSection :", error.message || error);
+    res.status(500).json({
+      massage: error.message || error,
+    });
+  }
+};
+
+module.exports = {
+  getSection,
+  viewSection,
+  createSection,
+  updateSection,
+  deleteSection,
+  viewSectionByFilter,
+  removeSectionMajor,
+  addSectionMajor,
+};

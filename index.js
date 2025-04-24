@@ -3,6 +3,9 @@ const mongoose = require("mongoose");
 const SubjectModal = require("./model/subject.modal");
 const { sendLineNotificate } = require("./services/sendMessageToLine");
 const subjectRoute = require("./router/subject.route");
+const instructorRoute = require("./router/instrutor.route");
+const sectionRoute = require("./router/section.route");
+
 
 require("dotenv").config();
 
@@ -25,6 +28,8 @@ app.use(
 
 //routes
 app.use("/subjects", subjectRoute);
+app.use("/instructors",instructorRoute);
+app.use("/section",sectionRoute);
 
 //api connect
 app.get("/", (req, res) => {
