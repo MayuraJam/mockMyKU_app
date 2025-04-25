@@ -1,11 +1,19 @@
 const mongoose = require("mongoose");
 
 const SectionScrema = mongoose.Schema({
+  // subject_id: {
+  //   type: String,
+  // },
+  // Instructors_id: {
+  //   type: String,
+  // },
   subject_id: {
-    type: String,
+    type: mongoose.Schema.Types.ObjectId,
+    ref:"Subject"
   },
   Instructors_id: {
-    type: String,
+    type: mongoose.Schema.Types.ObjectId,
+    ref : "Instructor"
   },
   roomNumber: {
     type: String,
@@ -44,8 +52,12 @@ const SectionScrema = mongoose.Schema({
       major_id:String,
       level : String
     }
-  ]
-});
+  ],
+  campus_id : {
+    type: String,
+  },
+}
+);
 
 
 

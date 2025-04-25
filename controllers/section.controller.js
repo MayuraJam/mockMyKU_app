@@ -2,7 +2,43 @@ const SectionModal = require("../model/section.modal");
 
 const getSection = async (req, res) => {
   try {
-    const response = await SectionModal.find(); //แสดงข้อมูล
+    const response = await SectionModal.aggregate([
+      {
+        $lookup: {
+          from: "subject",
+          localField: "subject_id",
+          foreignField: "_id",
+          as: "subject",
+        },
+      },
+      {
+        $unwind: "$subject",
+      },
+      {
+        $lookup: {
+          from: "instructor",
+          localField: "Instructors_id",
+          foreignField: "_id",
+          as: "instructor",
+        },
+      },
+      {
+        $unwind: "$instructor",
+      },
+      {
+        $project:{
+          "subject.subjectID" : 1,
+          "subject.subjectNameTH" : 1,
+          "subject.subjectNameEN" : 1,
+          timeSchedule : 1,
+          roomNumber : 1,
+          limitCount :1,
+          program : 1,
+          memberCount : {$size : "$member"}
+        }
+      }
+    ]);
+
     if (response.length === 0) {
       console.log("Data not found");
       return res.status(404).json({ massage: "get section not found" });
@@ -15,10 +51,13 @@ const getSection = async (req, res) => {
   }
 };
 
+//ใช้ในการแสดงรายละเอียดของ section
 const viewSection = async (req, res) => {
   const { id } = req.params;
   try {
-    const response = await SectionModal.findById(id);
+    const response = await SectionModal.findById(id)
+      .populate("subject_id")
+      .populate("Instructors_id");
     if (response.length === 0) {
       return res.status(404).json({ massage: "get section not found" });
     }
@@ -30,17 +69,57 @@ const viewSection = async (req, res) => {
     });
   }
 };
-
+//ใช้ในหน้าค้นหาวิชา เพื่อทำการลงทะเบียนเรียน
 const viewSectionByFilter = async (req, res) => {
   try {
-    const query = {};
-    if (req.body.subject_id) query.subject_id = req.body.subject_id;
-    if (req.body.semester) query.semester = req.body.semester;
-    if (req.body.program) query.program = req.body.program;
-
-    const response = await SectionModal.find(query);
+    const response = await SectionModal.aggregate([
+      {
+        $lookup: {
+          from: "subject",
+          localField: "subject_id",
+          foreignField: "_id",
+          as: "subject",
+        },
+      },
+      {
+        $unwind: "$subject",
+      },
+      {
+        $lookup: {
+          from: "instructor",
+          localField: "Instructors_id",
+          foreignField: "_id",
+          as: "instructor",
+        },
+      },
+      {
+        $unwind: "$instructor",
+      },
+      {
+        $match: {
+          ...(req.body.subjectName && {
+            "subject.subjectNameEN": {
+              $regex: req.body.subjectName,
+              $options: "i",
+            },
+          }),
+          ...(req.body.subjectID && {
+            "subject.subjectID": {
+              $regex: req.body.subjectID,
+              $options: "i",
+            },
+          }),
+          ...(req.body.program && { program: req.body.program }),
+          ...(req.body.semester && { semester: req.body.semester }),
+          ...(req.body.sectionId && { _id: req.body.sectionId }),
+          ...(req.body.campus_id && { campus_id: req.body.campus_id }),
+          actionStatus: "O",
+        },
+      },
+    ]);
+    console.log("Response section filter data", response);
     if (response.length === 0) {
-      return res.status(404).json({ massage: "get section not found" });
+      return res.status(404).json({ massage: "this section not open to register" });
     }
     res.status(200).json({ response });
   } catch (error) {
@@ -54,7 +133,6 @@ const viewSectionByFilter = async (req, res) => {
 const createSection = async (req, res) => {
   try {
     //สร้างรหัสวิชา เลือกจากหน้าบ้าน => ได้เป็นหมายเลขออกมาประกอบกัน
-    // const newData = await SubjectModal.create(req.body); //create new sunject service
     const newData = new SectionModal();
     const requestBody = req.body;
     newData.subject_id = requestBody.subject_id;
@@ -69,6 +147,8 @@ const createSection = async (req, res) => {
     newData.member = requestBody.member;
     newData.timeSchedule = requestBody.timeSchedule;
     newData.major = requestBody.major;
+    newData.campus_id = requestBody.campus_id;
+
 
     await newData.save();
     res.status(200).json({ newData });
@@ -98,7 +178,7 @@ const updateSection = async (req, res) => {
         actionStatus: requestBody.actionStatus,
         timeSchedule: requestBody.timeSchedule,
         member: requestBody.member,
-        // major : requestBody.major,
+        campus_id : requestBody.campus_id,
         updateDate: new Date(),
       },
       {

@@ -24,6 +24,9 @@ const InstructorScrema = mongoose.Schema({
       campus_id: {
         type: String,
       },
+      room: {
+        type: String,
+      },
       createDate :{
         type:Date,
       },

@@ -34,7 +34,6 @@ const viewInstructor = async (req, res) => {
 const createInstructor = async (req, res) => {
   try {
     //สร้างรหัสวิชา เลือกจากหน้าบ้าน => ได้เป็นหมายเลขออกมาประกอบกัน
-    // const newData = await SubjectModal.create(req.body); //create new sunject service
     const newData = new InstructorModal();
     const requestBody = req.body;
     newData.instructorsNameTH = requestBody.instructorsNameTH;
@@ -44,6 +43,7 @@ const createInstructor = async (req, res) => {
     newData.email = requestBody.email;
     newData.telephone = requestBody.telephone;
     newData.campus_id = requestBody.campus_id;
+    newData.room = requestBody.room;
     newData.createDate = new Date();
     newData.updateDate = new Date();
     await newData.save();
@@ -72,6 +72,7 @@ const updateInstructor = async (req, res) => {
         email: requestBody.email,
         telephone: requestBody.telephone,
         campus_id: requestBody.campus_id,
+        room : requestBody.room,
         updateDate: new Date(),
       },
       {

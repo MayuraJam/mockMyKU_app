@@ -1,6 +1,5 @@
 const express = require("express");
 const mongoose = require("mongoose");
-const SubjectModal = require("./model/subject.modal");
 const { sendLineNotificate } = require("./services/sendMessageToLine");
 const subjectRoute = require("./router/subject.route");
 const instructorRoute = require("./router/instrutor.route");
