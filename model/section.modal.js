@@ -1,12 +1,6 @@
 const mongoose = require("mongoose");
 
 const SectionScrema = mongoose.Schema({
-  // subject_id: {
-  //   type: String,
-  // },
-  // Instructors_id: {
-  //   type: String,
-  // },
   subject_id: {
     type: mongoose.Schema.Types.ObjectId,
     ref:"Subject"

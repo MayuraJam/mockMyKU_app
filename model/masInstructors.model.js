@@ -9,6 +9,10 @@ const InstructorScrema = mongoose.Schema({
         type: String,
         required: true,
       },
+      instructorId : {
+        type:String,
+        required:true
+      },
       department: {
         type: String,
       },

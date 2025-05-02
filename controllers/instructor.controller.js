@@ -2,7 +2,20 @@ const InstructorModal = require("../model/masInstructors.model");
 
 const getInstructor = async (req, res) => {
   try {
-    const response = await InstructorModal.find(); //แสดงข้อมูล
+    // const response = await InstructorModal.find(); //แสดงข้อมูล
+    const response = await InstructorModal.aggregate([
+     {
+      $project:{
+        instructorId :1,
+        instructorsNameTH : 1,
+        instructorsNameEN : 1,
+        department : 1,
+        email:1
+      }
+     }
+    ]); //แสดงข้อมูลในรูปแบบ list
+    
+
     if (response.length === 0) {
       console.log("Data not found");
       return res.status(404).json({ massage: "get instructor not found" });
@@ -36,6 +49,7 @@ const createInstructor = async (req, res) => {
     //สร้างรหัสวิชา เลือกจากหน้าบ้าน => ได้เป็นหมายเลขออกมาประกอบกัน
     const newData = new InstructorModal();
     const requestBody = req.body;
+    const randomId = "I"+Math.floor(1000+Math.random()*9000).toString();
     newData.instructorsNameTH = requestBody.instructorsNameTH;
     newData.instructorsNameEN = requestBody.instructorsNameEN;
     newData.department = requestBody.department;
@@ -46,6 +60,7 @@ const createInstructor = async (req, res) => {
     newData.room = requestBody.room;
     newData.createDate = new Date();
     newData.updateDate = new Date();
+    newData.instructorId = randomId;
     await newData.save();
     res.status(200).json({ newData });
   } catch (error) {
@@ -69,9 +84,7 @@ const updateInstructor = async (req, res) => {
         instructorsNameEN: requestBody.instructorsNameEN,
         department: requestBody.department,
         position: requestBody.position,
-        email: requestBody.email,
         telephone: requestBody.telephone,
-        campus_id: requestBody.campus_id,
         room : requestBody.room,
         updateDate: new Date(),
       },

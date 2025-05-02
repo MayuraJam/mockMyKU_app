@@ -116,8 +116,19 @@ const viewSectionByFilter = async (req, res) => {
           actionStatus: "O",
         },
       },
+      {
+        $project:{
+          "subject.subjectID" : 1,
+          "subject.subjectNameTH" : 1,
+          "subject.subjectNameEN" : 1,
+          timeSchedule : 1,
+          roomNumber : 1,
+          limitCount :1,
+          program : 1,
+          memberCount : {$size : "$member"}
+        }
+      }
     ]);
-    console.log("Response section filter data", response);
     if (response.length === 0) {
       return res.status(404).json({ massage: "this section not open to register" });
     }
