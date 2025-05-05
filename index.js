@@ -7,6 +7,7 @@ const sectionRoute = require("./router/section.route");
 const MajorRoute = require("./router/major.route");
 const session = require('express-session');
 const jwt = require('jsonwebtoken');
+const cors = require("cors");
 
 require("dotenv").config();
 
@@ -34,7 +35,7 @@ app.use(session({
     maxAge : 60000 * 60,
   }
 }));
-
+app.use(cors());
 
 //routes
 app.use("/subjects", subjectRoute);
