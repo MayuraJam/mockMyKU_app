@@ -1,4 +1,5 @@
 const StudentModal = require("../model/student.modal");
+// import mongoose from 'mongoose';
 const mongoose = require("mongoose");
 
 const getStudent = async (req, res) => {
@@ -88,7 +89,7 @@ const createEmail = (firstname, lastName) => {
     .slice(0, 2)
     .toLowerCase()}@ku.ac.th`;
   return emailFormat;
-};
+}
 
 const createStudent = async (req, res) => {
   try {
@@ -166,6 +167,26 @@ const updateStudent = async (req, res) => {
   }
 };
 
+const uploadsImage = async (req,res)=>{
+  const body = req.body;
+  try {
+    const newImage = await StudentModal.findByIdAndUpdate(id,{
+      profileImage : body.profileImage
+    },
+    {
+      new: true, // ให้คืนค่าที่อัปเดตแล้ว
+      runValidators: true, // ให้ตรวจสอบ schema validation ด้วย
+    })
+    const getUpdateProfileImage = await StudentModal.findById(id);
+    res.status(200).json(getUpdateProfileImage);
+    console.log("Upload profile image success");
+  } catch (error) {
+    res.status(500).json({
+      massage : error.message
+    })
+  }
+}
+
 const deleteStudent = async (req, res) => {
   const { id } = req.params;
   try {
@@ -197,5 +218,6 @@ module.exports = {
   deleteStudent,
   updateStudent,
   getStudent,
-  viewStudent
+  viewStudent,
+  uploadsImage
 };

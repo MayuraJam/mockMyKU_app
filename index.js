@@ -8,6 +8,7 @@ const MajorRoute = require("./router/major.route");
 const session = require('express-session');
 const jwt = require('jsonwebtoken');
 const cors = require("cors");
+const connect = require("./configs/databaseConnect.js");
 
 require("dotenv").config();
 
@@ -15,10 +16,10 @@ const DBurl = process.env.MONGO_URI;
 const port = 3000;
 const app = express();
 //mongoDB connect
-mongoose
-  .connect(DBurl)
-  .then(() => console.log("Mongo is connected"))
-  .catch((err) => console.error("Mongo connection fail :", err));
+// mongoose
+//   .connect(DBurl)
+//   .then(() => console.log("Mongo is connected"))
+//   .catch((err) => console.error("Mongo connection fail :", err));
 
 //กำหนด middleware ว่าสั่งให้ทำอะไร
 app.use(express.json());
@@ -58,7 +59,8 @@ app.get("/downloadTextFile", (req, res) => {
   });
 });
 
-
-app.listen(port, () => {
-  console.log("Server is running on server 3000");
+connect().then(() => {
+  app.listen(port, () => {
+    console.log(`Server is running on port`, port);
+  });
 });

@@ -47,18 +47,20 @@ const StudentScrema = mongoose.Schema({
   birthDate: {
     type: String,
   },
-  createDate: {
-    type: Date,
-  },
-  updateDate: {
-    type: Date,
-    default: Date.now,
-  },
   campus_id: {
     type: String,
   },
   status: {
     type: String,
+  },
+  profileImage:{
+    type : String 
+  },createDate: {
+    type: Date,
+  },
+  updateDate: {
+    type: Date,
+    default: Date.now,
   },
 });
 const StudentModal = mongoose.model("Student", StudentScrema, "student");

@@ -13,6 +13,28 @@ const getMasMajor = async (req, res) => {
   }
 };
 
+const getDropdownMasMajor = async (req, res) => {
+  try {
+    const response = await MajorModal.aggregate([
+      {$match:{
+        ...(req.body.majorNameTH && {majorNameTH:req.body.majorNameTH})
+      }},{
+        $project:{
+          major_Id:1,
+          majorNameTH : 1
+        }
+      }
+    ]);
+    if (!response) {
+      return res.status(404).json({ massage: "get Major not found" });
+    } else {
+      res.json(response);
+    }
+  } catch (error) {
+    res.status(500).json({ massage: "get Major data fail" });
+  }
+};
+
 const viewMajor = async (req, res) => {
     const { id } = req.params;
     try {
@@ -65,5 +87,6 @@ const createMajor = async (req, res) => {
 module.exports = {
   createMajor,
   getMasMajor,
-  viewMajor
+  viewMajor,
+  getDropdownMasMajor
 };
