@@ -63,7 +63,10 @@ const SubjectScrema = mongoose.Schema(
       type:Date,
       default:Date.now
     },
-  }
+  },{
+  versionKey : false,
+  timestamps : true
+}
 );
 
 // modal

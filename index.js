@@ -5,21 +5,16 @@ const instructorRoute = require("./router/instrutor.route");
 const studentRoute = require("./router/student.route");
 const sectionRoute = require("./router/section.route");
 const MajorRoute = require("./router/major.route");
+const UserRoute = require("./router/users.route.js");
 const session = require('express-session');
-const jwt = require('jsonwebtoken');
 const cors = require("cors");
 const connect = require("./configs/databaseConnect.js");
+const cookieParser = require("cookie-parser");
 
 require("dotenv").config();
 
-const DBurl = process.env.MONGO_URI;
 const port = 3000;
 const app = express();
-//mongoDB connect
-// mongoose
-//   .connect(DBurl)
-//   .then(() => console.log("Mongo is connected"))
-//   .catch((err) => console.error("Mongo connection fail :", err));
 
 //กำหนด middleware ว่าสั่งให้ทำอะไร
 app.use(express.json());
@@ -37,6 +32,7 @@ app.use(session({
   }
 }));
 app.use(cors());
+app.use(cookieParser());
 
 //routes
 app.use("/subjects", subjectRoute);
@@ -44,7 +40,7 @@ app.use("/instructors",instructorRoute);
 app.use("/section",sectionRoute);
 app.use("/student",studentRoute);
 app.use("/major",MajorRoute);
-// app.use("/authentication",UserRoute);
+app.use("/authentication",UserRoute);
 //อนาคตจะทำการสร้างแบบ form service แลลกรอกหลายหน้า แล้วมีกาเก็บข้อมูลใน session เวลาย้อนกลับมาแล้วข้อมูลยังอยู่ 
 //api connect
 app.get("/", (req, res) => {
@@ -58,6 +54,7 @@ app.get("/downloadTextFile", (req, res) => {
     return res.status(404).json({ massage: "don't have file to download" });
   });
 });
+
 
 connect().then(() => {
   app.listen(port, () => {

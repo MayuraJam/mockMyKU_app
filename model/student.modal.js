@@ -52,16 +52,19 @@ const StudentScrema = mongoose.Schema({
   },
   status: {
     type: String,
-  },
-  profileImage:{
-    type : String 
-  },createDate: {
+  },password: {
+      type: String,
+    },
+  createDate: {
     type: Date,
   },
   updateDate: {
     type: Date,
     default: Date.now,
   },
+},{
+  versionKey : false,
+  timestamps : true
 });
 const StudentModal = mongoose.model("Student", StudentScrema, "student");
 module.exports = StudentModal;

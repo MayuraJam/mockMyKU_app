@@ -1,6 +1,4 @@
 const StudentModal = require("../model/student.modal");
-// import mongoose from 'mongoose';
-const mongoose = require("mongoose");
 
 const getStudent = async (req, res) => {
   try {
@@ -100,29 +98,31 @@ const createStudent = async (req, res) => {
       getOnlyYear() +
       "3020" +
       Math.floor(1000 + Math.random() * 9000).toString();
-
-    newData.studentId = randomId;
-    newData.studentFirstNameTH = requestBody.studentFirstNameTH;
-    newData.studentLastNameTH = requestBody.studentLastNameTH;
-    newData.studentFirstNameEN = requestBody.studentFirstNameEN;
-    newData.studentLastNameEN = requestBody.studentLastNameEN;
-    newData.level = 1;
-    newData.major_id = requestBody.major_id;
-    newData.email = createEmail(
-      requestBody.studentFirstNameEN,
-      requestBody.studentLastNameEN
-    );
-    newData.telephone = requestBody.telephone;
-    newData.campus_id = requestBody.campus_id;
-    newData.AdmissionType = requestBody.AdmissionType;
-    newData.sex = requestBody.sex;
-    newData.birthDate = requestBody.birthDate;
-    newData.addmissionYear = requestBody.addmissionYear;
-    newData.createDate = new Date();
-    newData.updateDate = new Date();
-    newData.status = "ยังศึกษาอยู่";
-    await newData.save();
-    res.status(200).json({ newData });
+    if(requestBody.role === "Student"){
+      newData.studentId = randomId;
+      newData.studentFirstNameTH = requestBody.studentFirstNameTH;
+      newData.studentLastNameTH = requestBody.studentLastNameTH;
+      newData.studentFirstNameEN = requestBody.studentFirstNameEN;
+      newData.studentLastNameEN = requestBody.studentLastNameEN;
+      newData.level = 1;
+      newData.major_id = requestBody.major_id;
+      newData.email = createEmail(
+        requestBody.studentFirstNameEN,
+        requestBody.studentLastNameEN
+      );
+      newData.telephone = requestBody.telephone;
+      newData.campus_id = requestBody.campus_id;
+      newData.AdmissionType = requestBody.AdmissionType;
+      newData.sex = requestBody.sex;
+      newData.birthDate = requestBody.birthDate;
+      newData.addmissionYear = requestBody.addmissionYear;
+      newData.createDate = new Date();
+      newData.updateDate = new Date();
+      newData.status = "ยังศึกษาอยู่";
+      newData.password = requestBody.password;
+      await newData.save();
+      res.status(200).json({ newData });
+    }
   } catch (error) {
     console.error(error.message || error);
 
@@ -167,25 +167,25 @@ const updateStudent = async (req, res) => {
   }
 };
 
-const uploadsImage = async (req,res)=>{
-  const body = req.body;
-  try {
-    const newImage = await StudentModal.findByIdAndUpdate(id,{
-      profileImage : body.profileImage
-    },
-    {
-      new: true, // ให้คืนค่าที่อัปเดตแล้ว
-      runValidators: true, // ให้ตรวจสอบ schema validation ด้วย
-    })
-    const getUpdateProfileImage = await StudentModal.findById(id);
-    res.status(200).json(getUpdateProfileImage);
-    console.log("Upload profile image success");
-  } catch (error) {
-    res.status(500).json({
-      massage : error.message
-    })
-  }
-}
+// const uploadsImage = async (req,res)=>{
+//   const body = req.body;
+//   try {
+//     const newImage = await StudentModal.findByIdAndUpdate(id,{
+//       profileImage : body.profileImage
+//     },
+//     {
+//       new: true, // ให้คืนค่าที่อัปเดตแล้ว
+//       runValidators: true, // ให้ตรวจสอบ schema validation ด้วย
+//     })
+//     const getUpdateProfileImage = await StudentModal.findById(id);
+//     res.status(200).json(getUpdateProfileImage);
+//     console.log("Upload profile image success");
+//   } catch (error) {
+//     res.status(500).json({
+//       massage : error.message
+//     })
+//   }
+// }
 
 const deleteStudent = async (req, res) => {
   const { id } = req.params;
@@ -219,5 +219,5 @@ module.exports = {
   updateStudent,
   getStudent,
   viewStudent,
-  uploadsImage
+  // uploadsImage
 };

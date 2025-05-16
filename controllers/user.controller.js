@@ -1,33 +1,104 @@
-const jwt = require('jsonwebtoken');
+const jwt = require("jsonwebtoken");
 require("dotenv").config();
-const authenticateToken = async (req,res)=>{
-res.json()
-}
+const UserModal = require("../model/user.model");
+const { handleError } = require("../util/utilFunction");
 
-const logIn = async (req, res) => {
-    try {
-      const userEmail = req.body.email;
-      const user = {email:userEmail}
-      const accessToken = jwt.sign(user,process.env.ACCESS_TOKEN_SECRET)
-      console.log("accessTokent is",accessToken);
-    } catch (error) {
-      res.status(500).json({ massage: "login fail" });
+//function not a service 
+ const maxAgeToken = 3*24*60*60;
+
+const createToken = (id)=>{
+  return jwt.sign({id},'mayura secret',{
+    expiresIn: maxAgeToken
+ });
+ }
+// service
+
+const getAllUser = async (req, res) => {
+  try {
+        const Response = await UserModal.find(); //แสดงข้อมูล
+    if (Response.length === 0) {
+      console.log("Data not found");
+      return res.status(404).json({ massage: "get User not found" });
+    } else {
+      res.json(Response);
+      console.log("data fetch:", Response);
     }
-  };
-
-  function authenticateToken(req,res,next){
-    const authHeader = req.header['authorization']
-    const token = authHeader && authHeader.split('')[1]
-    if(!token) return res.status(404)
-        .json({ massage: `this token not found` });
-    jwt.verify(token,process.env.ACCESS_TOKEN_SECRET,(err,user)=>{
-        if(err) return  res.status(403)
-        req.user = user 
-    next();
+  } catch (error) {
+    res.status(500).json({
+      error: error.message || error,
     });
+    handleError(error);
   }
+};
+const signUp = async (req, res) => {
+  try {
+  } catch (error) {
+    res.status(500).json({
+      error: error.message || error,
+    });
+    // handleError(error);
+  }
+};
 
-  //เมื่อทำการ login ให้ทำการตรวจสอบว่า email password ที่ส่งเข้ามาคือ role อะไร แล้วให้ console ออกมาว่าคือ role อะไร
-  //เปลี่ยนเป็นแยกตามหมายเลขประจำตัวแทน เหมือนเว็บจริง รหัสจะถูกเจนจากการสร้างบัญชีใหม่
+const login = async (req, res) => {
+  try {
+  } catch (error) {
+    res.status(500).json({
+      error: error.message || error,
+    });
+    // handleError(error);
+  }
+};
 
-  module.exports = {logIn}
+const createNewUser = async (req, res) => {
+  const reqBody = req.body;
+  const { email, password } = reqBody;
+  try {
+    //ทำการตรวจสอบว่ามีการใส่ email ที่เคยสร้างไว้แล้วหรือยัง
+    const user = await UserModal.create({ email, password });
+    const token = createToken(user._id);
+
+    //1. กรณีมีหน้าบ้าน เพื่อส่งตัว Token -> cookie
+    res.cookie('jwt',token,{
+      httpOnly : true, //ถ้าเป็น true -> cookie ใช้ได้เฉพาะ Http (client อ่านไม่ได้) : boolean
+      maxAge : maxAgeToken*1000 //อายุของ cookie (milisecont) : number
+    })
+    //2. ไม่มีหน้าบ้าน
+    res.status(201).json({
+      massage: "Create new User success!",
+      userResponse: user,
+      token : token
+    });
+  } catch (error) {
+    const errMassage = handleError(error);
+    res.status(500).json(errMassage);
+  }
+};
+
+const AuthenCurrentUser = async (req, res) => {
+  const reqBody = req.body;
+  const { email, password } = reqBody;
+  try {
+  } catch (error) {
+    const errMassage = handleError(error);
+    res.status(500).json(errMassage);
+  }
+};
+
+const logout = async (req, res) => {
+  try {
+  } catch (error) {
+    res.status(500).json({
+      error: error.message || error,
+    });
+    // handleError(error);
+  }
+};
+module.exports = {
+  signUp,
+  login,
+  createNewUser,
+  AuthenCurrentUser,
+  logout,
+  getAllUser
+};
