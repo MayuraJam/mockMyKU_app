@@ -4,7 +4,7 @@ const UserModal = require("../model/user.model");
 require("dotenv").config();
 
 const requireAuth = (req, res, next) => {
-  const token = req.coolies.jwt;
+  const token = req.cookie.jwt; //ดึง jwt จาก cookie
 
   // check json web token exists & verified
   if (token) {

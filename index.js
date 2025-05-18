@@ -10,9 +10,6 @@ const session = require("express-session");
 const cors = require("cors");
 const connect = require("./configs/databaseConnect.js");
 const cookieParser = require("cookie-parser");
-const swaggerUI = require("swagger-ui-express");
-const swaggerSpec = require("./configs/swagger.js");
-const { checkUser } = require("./middleware/authMiddleware.js");
 
 require("dotenv").config();
 const port = 3000;
@@ -37,7 +34,6 @@ app.use(
 );
 app.use(cors());
 app.use(cookieParser());
-app.use("/api-docs", swaggerUI.serve, swaggerUI.setup(swaggerSpec));
 
 //routes zone
 app.use("/subjects", subjectRoute);
@@ -46,7 +42,6 @@ app.use("/section", sectionRoute);
 app.use("/student", studentRoute);
 app.use("/major", MajorRoute);
 app.use("/authentication", UserRoute);
-app.get('*',checkUser); //ตรวจสอบข้อมูลของทุก user
 //อนาคตจะทำการสร้างแบบ form service แลลกรอกหลายหน้า แล้วมีกาเก็บข้อมูลใน session เวลาย้อนกลับมาแล้วข้อมูลยังอยู่
 //api connect
 app.get("/", (req, res) => {

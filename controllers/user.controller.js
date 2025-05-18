@@ -2,6 +2,7 @@ const jwt = require("jsonwebtoken");
 require("dotenv").config();
 const UserModal = require("../model/user.model");
 const { handleError } = require("../util/utilFunction");
+const StudentModal = require("../model/student.modal");
 
 //function not a service
 const maxAgeToken = 3 * 24 * 60 * 60;
@@ -87,6 +88,33 @@ const LoginPost = async (req, res) => {
     res.status(400).json(errMassage);
   }
 };
+
+//เข้าสู่ระบบได้ทั้งนิสิตและอาจารย์
+const LoginToMyKU = async (req, res) => {
+  const reqBody = req.body;
+  const { officialID, password, role } = reqBody;
+  try {
+    if (role === "Student") {
+      const user = await StudentModal.login(officialID, password);
+      console.log("data:", user);
+      const token = createToken(user._id);
+      res.cookie("jwt", token, {
+        httpOnly: true,
+        maxAge: maxAgeToken * 1000,
+      });
+      res.status(200).json({
+        user: user, //ข้อมูลทั้งหมดของเรา
+        massage: "Welcome to Student homepage <3 ",
+      });
+    }
+    else{
+    res.status(400).json({ message: "ไม่มีผู้เข้าใช้งานในตำแหน่งนี้" });
+    }
+  } catch (error) {
+    res.status(400).json({ message: "ไม่สามารถ login ได้" });
+  }
+};
+
 // ทำการล้าง token jwt ออก
 const logout = async (req, res) => {
   try {
@@ -117,11 +145,13 @@ const deleteUser = async (req, res) => {
   }
 };
 
-
 module.exports = {
   LoginPost,
   createNewUser,
   logout,
   getAllUser,
   deleteUser,
+  createToken,
+  maxAgeToken,
+  LoginToMyKU
 };

@@ -5,7 +5,8 @@ LoginPost,
 createNewUser,
 logout,
 getAllUser,
-deleteUser
+deleteUser,
+LoginToMyKU
 } = require("../controllers/user.controller");
 const { requireAuth } = require("../middleware/authMiddleware");
 
@@ -15,5 +16,6 @@ router.post("/login",LoginPost); //ให้แสดงเป็นข้อค
 router.get("/logout", logout); //ให้แสดงเป็นข้อความ console.log ว่าออกจากระบบสำเร็จ
 router.get("/allUsers", getAllUser);
 router.delete("/deleteUser/:id",deleteUser);
+router.post("/loginToMyKU",LoginToMyKU);
 
 module.exports = router;

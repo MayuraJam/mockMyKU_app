@@ -8,12 +8,14 @@ const {
   deleteSection,
   viewSectionByFilter,
   removeSectionMajor,
-  addSectionMajor
+  addSectionMajor,
+  getMemberFromSection
 } = require("../controllers/section.controller");
 
 router.get("/", getSection);
 router.get("/filter/", viewSectionByFilter);
 router.get("/:id", viewSection);
+router.post("/getMember/",getMemberFromSection);
 router.post("/", createSection);
 router.put("/:id", updateSection);
 router.delete("/:id", deleteSection);

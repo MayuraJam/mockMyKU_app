@@ -1,4 +1,6 @@
 const StudentModal = require("../model/student.modal");
+const { handleError } = require("../util/utilFunction");
+const { createToken, maxAgeToken } = require("./user.controller");
 
 const getStudent = async (req, res) => {
   try {
@@ -17,12 +19,6 @@ const getStudent = async (req, res) => {
       {
         $match: {
           ...(req.body.studentId && { studentId: req.body.studentId }),
-          ...(req.body.studentFirstNameTH && {
-            studentFirstNameTH: req.body.studentFirstNameTH,
-          }),
-          ...(req.body.studentLastNameTH && {
-            studentLastNameTH: req.body.studentLastNameTH,
-          }),
           ...(req.body.studentFirstNameEN && {
             studentFirstNameEN: req.body.studentFirstNameEN,
           }),
@@ -30,23 +26,23 @@ const getStudent = async (req, res) => {
             studentLastNameEN: req.body.studentLastNameEN,
           }),
           ...(req.body.level && { level: req.body.level }),
-          ...(req.body.majorNameTH&&{
-            "major.majorNameTH" :{
-              $regex:req.body.majorNameTH,
-              $options : "i"
-            }
-          })
+          ...(req.body.majorNameTH && {
+            "major.majorNameTH": {
+              $regex: req.body.majorNameTH,
+              $options: "i",
+            },
+          }),
         },
       },
       {
         $project: {
           studentId: 1,
-          studentFirstNameTH: 1,
-          studentLastNameTH: 1,
           studentFirstNameEN: 1,
           studentLastNameEN: 1,
           level: 1,
-          "major.majorNameEN" : 1,
+          status :1,
+          major_id : 1,
+          "major.majorNameEN": 1,
         },
       },
     ]);
@@ -65,7 +61,7 @@ const getStudent = async (req, res) => {
 const viewStudent = async (req, res) => {
   const { id } = req.params;
   try {
-    const response = await StudentModal.findById(id)      
+    const response = await StudentModal.findById(id);
     if (!response) {
       return res.status(404).json({ massage: "student data not found" });
     }
@@ -87,7 +83,7 @@ const createEmail = (firstname, lastName) => {
     .slice(0, 2)
     .toLowerCase()}@ku.ac.th`;
   return emailFormat;
-}
+};
 
 const createStudent = async (req, res) => {
   try {
@@ -98,38 +94,34 @@ const createStudent = async (req, res) => {
       getOnlyYear() +
       "3020" +
       Math.floor(1000 + Math.random() * 9000).toString();
-    if(requestBody.role === "Student"){
-      newData.studentId = randomId;
-      newData.studentFirstNameTH = requestBody.studentFirstNameTH;
-      newData.studentLastNameTH = requestBody.studentLastNameTH;
-      newData.studentFirstNameEN = requestBody.studentFirstNameEN;
-      newData.studentLastNameEN = requestBody.studentLastNameEN;
-      newData.level = 1;
-      newData.major_id = requestBody.major_id;
-      newData.email = createEmail(
-        requestBody.studentFirstNameEN,
-        requestBody.studentLastNameEN
-      );
-      newData.telephone = requestBody.telephone;
-      newData.campus_id = requestBody.campus_id;
-      newData.AdmissionType = requestBody.AdmissionType;
-      newData.sex = requestBody.sex;
-      newData.birthDate = requestBody.birthDate;
-      newData.addmissionYear = requestBody.addmissionYear;
-      newData.createDate = new Date();
-      newData.updateDate = new Date();
-      newData.status = "ยังศึกษาอยู่";
-      newData.password = requestBody.password;
-      await newData.save();
-      res.status(200).json({ newData });
-    }
-  } catch (error) {
-    console.error(error.message || error);
-
-    res.status(500).json({
-      message: "create new student fail",
-      error: error.message || error,
+    newData.studentId = randomId;
+    newData.studentFirstNameEN = requestBody.studentFirstNameEN;
+    newData.studentLastNameEN = requestBody.studentLastNameEN;
+    newData.level = 1;
+    newData.major_id = requestBody.major_id;
+    newData.email = createEmail(
+      requestBody.studentFirstNameEN,
+      requestBody.studentLastNameEN
+    );
+    newData.telephone = requestBody.telephone;
+    newData.campus_id = requestBody.campus_id;
+    newData.AdmissionType = requestBody.AdmissionType;
+    newData.sex = requestBody.sex;
+    newData.addmissionYear = requestBody.addmissionYear;
+    newData.status = "ยังศึกษาอยู่";
+    newData.password = requestBody.password;
+    newData.role = "Student";
+    await newData.save();
+    const token = createToken(newData._id); //ทำการเก็บรหัสเป็น token
+    res.cookie("jwt", token, {
+      httpOnly: true,
+      maxAge: maxAgeToken * 1000,
     });
+    res.status(200).json({ newData, token: token });
+  } catch (error) {
+    console.error(error);
+    const errMassage = handleError(error);
+    res.status(500).json({ errMassage });
   }
 };
 
@@ -140,12 +132,12 @@ const updateStudent = async (req, res) => {
     const updateData = await StudentModal.findByIdAndUpdate(
       id,
       {
-        studentFirstNameTH: requestBody.studentFirstNameTH,
-        studentLastNameTH: requestBody.studentLastNameTH,
         studentFirstNameEN: requestBody.studentFirstNameEN,
         studentLastNameEN: requestBody.studentLastNameEN,
         telephone: requestBody.telephone,
-        updateDate: new Date(),
+        campus_id: requestBody.campus_id,
+        AdmissionType: requestBody.AdmissionType,
+        major_id : requestBody.major_id
       },
       {
         new: true, // ให้คืนค่าที่อัปเดตแล้ว
@@ -167,47 +159,38 @@ const updateStudent = async (req, res) => {
   }
 };
 
-// const uploadsImage = async (req,res)=>{
-//   const body = req.body;
-//   try {
-//     const newImage = await StudentModal.findByIdAndUpdate(id,{
-//       profileImage : body.profileImage
-//     },
-//     {
-//       new: true, // ให้คืนค่าที่อัปเดตแล้ว
-//       runValidators: true, // ให้ตรวจสอบ schema validation ด้วย
-//     })
-//     const getUpdateProfileImage = await StudentModal.findById(id);
-//     res.status(200).json(getUpdateProfileImage);
-//     console.log("Upload profile image success");
-//   } catch (error) {
-//     res.status(500).json({
-//       massage : error.message
-//     })
-//   }
-// }
 
-const deleteStudent = async (req, res) => {
+const changeToGrduate = async (req, res) => {
   const { id } = req.params;
   try {
-    const response = await StudentModal.findByIdAndUpdate(
-      id,
-      {
-        status: "นิสิตจบการศึกษาแล้ว",
-      },
-      {
-        new: true,
-        runValidators: true,
+    const student = await StudentModal.findById(id);
+    if (!student) {
+      return res.status(404).json({ message: "ไม่มีข้อมูลนิสิตคนนี้ในระบบ" });
+    }
+    if(student.level !== 4){
+    res.status(500).json({ massage: "ไม่สามารถขอยื่นจบการศึกษาได้" });
+    }
+    else{
+      const response = await StudentModal.findByIdAndUpdate(
+        id,
+        {
+          status: "นิสิตจบการศึกษาแล้ว",
+        },
+        {
+          new: true,
+          runValidators: true,
+        }
+      );
+      if (!response) {
+        return res.status(404).json({
+          massage: "Id not found to delete",
+        });
       }
-    );
-    if (!response) {
-      return res.status(404).json({
-        massage: "Id not found to delete",
+      res.status(200).json({
+        massage: `delete student id : ${id} successfully`,
+        data : response
       });
     }
-    res.status(200).json({
-      massage: `delete student id : ${id} successfully`,
-    });
   } catch (error) {
     res.status(500).json({ massage: error.massage || error });
   }
@@ -215,9 +198,7 @@ const deleteStudent = async (req, res) => {
 
 module.exports = {
   createStudent,
-  deleteStudent,
+  changeToGrduate,
   updateStudent,
   getStudent,
-  viewStudent,
-  // uploadsImage
-};
+  viewStudent,}

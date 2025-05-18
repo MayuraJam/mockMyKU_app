@@ -1,4 +1,5 @@
 const SectionModal = require("../model/section.modal");
+const {mongoose} = require("mongoose");
 
 const getSection = async (req, res) => {
   try {
@@ -26,17 +27,18 @@ const getSection = async (req, res) => {
         $unwind: "$instructor",
       },
       {
-        $project:{
-          "subject.subjectID" : 1,
-          "subject.subjectNameTH" : 1,
-          "subject.subjectNameEN" : 1,
-          timeSchedule : 1,
-          roomNumber : 1,
-          limitCount :1,
-          program : 1,
-          memberCount : {$size : "$member"}
-        }
-      }
+        $project: {
+          "subject.subjectID": 1,
+          "subject.subjectNameTH": 1,
+          "subject.subjectNameEN": 1,
+          timeSchedule: 1,
+          roomNumber: 1,
+          limitCount: 1,
+          program: 1,
+          memberCount: { $size: "$member" },
+          "instructor.instructorsNameTH": 1,
+        },
+      },
     ]);
 
     if (response.length === 0) {
@@ -48,6 +50,58 @@ const getSection = async (req, res) => {
     }
   } catch (error) {
     res.status(500).json({ massage: "get section not found" });
+  }
+};
+
+const getMemberFromSection = async (req, res) => {
+  try {
+    const sectionId = req.body.sectionId;
+
+    const response = await SectionModal.aggregate([
+      { $match: { _id: new mongoose.Types.ObjectId(sectionId) } },
+      { $unwind: "$member" },
+      {
+        $lookup: {
+          from: "student",
+          localField: "member.studentId",
+          foreignField: "_id",
+          as: "student",
+        },
+      },
+      {
+        $unwind: "$student",
+      },
+      {
+        $lookup: {
+          from: "subject",
+          localField: "subject_id",
+          foreignField: "_id",
+          as: "subject",
+        },
+      },
+      {
+        $unwind: "$subject",
+      },
+      {
+        $group: {
+          _id: "$_id",
+          members: {
+            $push: {
+              studentName: {
+                $concat: ["$student.studentFirstNameEN", " ", "$student.studentLastNameEN"]
+              },
+            },
+          },
+        },
+      },
+    ]);
+
+    if (response.length === 0) {
+      console.log("Data not found");
+      return res.status(404).json({ massage: "get section member not found" });
+    }
+  } catch (error) {
+    res.status(500).json({ massage: "section not found" });
   }
 };
 
@@ -117,20 +171,22 @@ const viewSectionByFilter = async (req, res) => {
         },
       },
       {
-        $project:{
-          "subject.subjectID" : 1,
-          "subject.subjectNameTH" : 1,
-          "subject.subjectNameEN" : 1,
-          timeSchedule : 1,
-          roomNumber : 1,
-          limitCount :1,
-          program : 1,
-          memberCount : {$size : "$member"}
-        }
-      }
+        $project: {
+          "subject.subjectID": 1,
+          "subject.subjectNameTH": 1,
+          "subject.subjectNameEN": 1,
+          timeSchedule: 1,
+          roomNumber: 1,
+          limitCount: 1,
+          program: 1,
+          memberCount: { $size: "$member" },
+        },
+      },
     ]);
     if (response.length === 0) {
-      return res.status(404).json({ massage: "this section not open to register" });
+      return res
+        .status(404)
+        .json({ massage: "this section not open to register" });
     }
     res.status(200).json({ response });
   } catch (error) {
@@ -160,7 +216,6 @@ const createSection = async (req, res) => {
     newData.major = requestBody.major;
     newData.campus_id = requestBody.campus_id;
 
-
     await newData.save();
     res.status(200).json({ newData });
   } catch (error) {
@@ -189,7 +244,7 @@ const updateSection = async (req, res) => {
         actionStatus: requestBody.actionStatus,
         timeSchedule: requestBody.timeSchedule,
         member: requestBody.member,
-        campus_id : requestBody.campus_id,
+        campus_id: requestBody.campus_id,
         updateDate: new Date(),
       },
       {
@@ -310,4 +365,5 @@ module.exports = {
   viewSectionByFilter,
   removeSectionMajor,
   addSectionMajor,
+  getMemberFromSection,
 };

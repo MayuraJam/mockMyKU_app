@@ -3,15 +3,16 @@ const router = express.Router();
 
 const {
   createStudent,
-  deleteStudent,
+  changeToGrduate,
   updateStudent,
   getStudent,
   viewStudent
 } = require("../controllers/student.controller");
+
 router.get("/", getStudent);
 router.get("/:id", viewStudent);
 router.post("/", createStudent);
-router.put("/delete/:id", deleteStudent);
+router.put("/graduateStatus/:id", changeToGrduate);
 router.put("/:id", updateStudent);
 
 module.exports = router;
