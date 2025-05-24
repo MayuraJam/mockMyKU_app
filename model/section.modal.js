@@ -32,8 +32,7 @@ const SectionScrema = mongoose.Schema({
     default: Date.now,
   },
   member: [{
-   studentId : mongoose.Schema.Types.ObjectId,
-   ref:"Student"
+type: mongoose.Schema.Types.ObjectId, ref: 'Student'
   }],
   timeSchedule:
     {

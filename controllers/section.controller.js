@@ -56,52 +56,18 @@ const getSection = async (req, res) => {
 const getMemberFromSection = async (req, res) => {
   try {
     const sectionId = req.body.sectionId;
-
-    const response = await SectionModal.aggregate([
-      { $match: { _id: new mongoose.Types.ObjectId(sectionId) } },
-      { $unwind: "$member" },
-      {
-        $lookup: {
-          from: "student",
-          localField: "member.studentId",
-          foreignField: "_id",
-          as: "student",
-        },
-      },
-      {
-        $unwind: "$student",
-      },
-      {
-        $lookup: {
-          from: "subject",
-          localField: "subject_id",
-          foreignField: "_id",
-          as: "subject",
-        },
-      },
-      {
-        $unwind: "$subject",
-      },
-      {
-        $group: {
-          _id: "$_id",
-          members: {
-            $push: {
-              studentName: {
-                $concat: ["$student.studentFirstNameEN", " ", "$student.studentLastNameEN"]
-              },
-            },
-          },
-        },
-      },
-    ]);
-
-    if (response.length === 0) {
-      console.log("Data not found");
-      return res.status(404).json({ massage: "get section member not found" });
+    
+    //ต้องการแสดงรายชื่อของนิสิตที่ทำการลงทะเบียน section นี้ โดยอ้างอิงรหัสนิสิตจากในตารางนิสิตกับ section โดยการวลลูปแสดง
+    const response = await SectionModal.findById(sectionId).populate({path:'member',
+    select : 'studentId studentFirstNameEN studentLastNameEN level major_id -_id'
+  }).exec();
+    if(!response){
+      return res.status(404).json({ massage: "get section not found" });
     }
+    res.status(200).json({ response });
+
   } catch (error) {
-    res.status(500).json({ massage: "section not found" });
+    res.status(500).json({ massage: "section not found",error });
   }
 };
 
