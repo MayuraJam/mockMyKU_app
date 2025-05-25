@@ -10,6 +10,7 @@ const session = require("express-session");
 const cors = require("cors");
 const connect = require("./configs/databaseConnect.js");
 const cookieParser = require("cookie-parser");
+const EnrollRoute = require("./router/enrollment.route.js");
 
 require("dotenv").config();
 const port = 3000;
@@ -42,6 +43,7 @@ app.use("/section", sectionRoute);
 app.use("/student", studentRoute);
 app.use("/major", MajorRoute);
 app.use("/authentication", UserRoute);
+app.use("/enrollment",EnrollRoute);
 //อนาคตจะทำการสร้างแบบ form service แลลกรอกหลายหน้า แล้วมีกาเก็บข้อมูลใน session เวลาย้อนกลับมาแล้วข้อมูลยังอยู่
 //api connect
 app.get("/", (req, res) => {

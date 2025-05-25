@@ -6,7 +6,7 @@ const {
   getMasMajor,
   viewMajor,
   getDropdownMasMajor
-} = require("../controllers/major.controllor");
+} = require("../controllers/major.controller");
 
 router.get("/", getMasMajor);
 router.post("/getDropdown/", getDropdownMasMajor);

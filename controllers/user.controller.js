@@ -127,6 +127,10 @@ const logout = async (req, res) => {
   }
 };
 
+const forgotPassword = async (req,res)=>{
+  //ค่อยกลับมาทำในส่วนนี้
+}
+
 const deleteUser = async (req, res) => {
   const { id } = req.params;
   try {

@@ -3,20 +3,22 @@ const mongoose = require("mongoose");
 const EnrollmentScrema = mongoose.Schema({
   student_id: {
     type: mongoose.Schema.Types.ObjectId,
-    ref:"Student"
+    ref:"Student",
+    require : [true,"Please enter studentID"]
   },
-  section_id: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref:"Section"
-  },
-  enrollmentTime : {
-    type:Date,
-  },
-    enrollmentStatus :{
-       type:String
-    },
+  enrollsectionList : [
+    {
+      section_id: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref:"Section"
+      },
+      enrollmentStatus : String,
+      enrollmentTime : Date,
+    }
+  ],
     semester :{
-       type:String
+       type: String,
+       require : [true,"Please enter semester"]
     },
 },{
     versionKey : false,

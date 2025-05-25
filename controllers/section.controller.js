@@ -31,11 +31,14 @@ const getSection = async (req, res) => {
           "subject.subjectID": 1,
           "subject.subjectNameTH": 1,
           "subject.subjectNameEN": 1,
+          "subject.subjectType" : 1,
           timeSchedule: 1,
           roomNumber: 1,
           limitCount: 1,
           program: 1,
           memberCount: { $size: "$member" },
+          member :1,
+          semester:1,
           "instructor.instructorsNameTH": 1,
         },
       },
@@ -56,7 +59,6 @@ const getSection = async (req, res) => {
 const getMemberFromSection = async (req, res) => {
   try {
     const sectionId = req.body.sectionId;
-    
     //ต้องการแสดงรายชื่อของนิสิตที่ทำการลงทะเบียน section นี้ โดยอ้างอิงรหัสนิสิตจากในตารางนิสิตกับ section โดยการวลลูปแสดง
     const response = await SectionModal.findById(sectionId).populate({path:'member',
     select : 'studentId studentFirstNameEN studentLastNameEN level major_id -_id'

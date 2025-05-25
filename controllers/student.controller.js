@@ -61,7 +61,9 @@ const getStudent = async (req, res) => {
 const viewStudent = async (req, res) => {
   const { id } = req.params;
   try {
-    const response = await StudentModal.findById(id);
+    const response = await StudentModal.findById(id)
+    .populate("enrollList")
+    ;
     if (!response) {
       return res.status(404).json({ massage: "student data not found" });
     }
@@ -111,6 +113,7 @@ const createStudent = async (req, res) => {
     newData.status = "ยังศึกษาอยู่";
     newData.password = requestBody.password;
     newData.role = "Student";
+    newData.enrollList = [];
     await newData.save();
     const token = createToken(newData._id); //ทำการเก็บรหัสเป็น token
     res.cookie("jwt", token, {
@@ -159,7 +162,7 @@ const updateStudent = async (req, res) => {
   }
 };
 
-
+//สำหรับเจ้าหน้าที่ อัปเดตเป็นอัตโนมัติ
 const changeToGrduate = async (req, res) => {
   const { id } = req.params;
   try {

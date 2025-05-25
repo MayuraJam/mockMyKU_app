@@ -9,10 +9,12 @@ const StudentScrema = mongoose.Schema(
     },
     studentFirstNameEN: {
       type: String,
+      match: /^[A-Za-z0-9\s]+$/,
       required: [true, "please enter a FirstName in English"]
     },
     studentLastNameEN: {
       type: String,
+      match: /^[A-Za-z0-9\s]+$/,
       required: [true, "please enter a LastName in English"]
     },
     level: {
@@ -33,7 +35,6 @@ const StudentScrema = mongoose.Schema(
     },
     addmissionYear: {
       type: String,
-      
     },
     AdmissionType: {
       type: String,
@@ -55,7 +56,13 @@ const StudentScrema = mongoose.Schema(
     },
     role:{
       type:String
-    }
+    },
+    enrollList :[
+      {
+        type : mongoose.Schema.Types.ObjectId,
+        ref :"Enroll"
+      }
+    ]
   },
   {
     versionKey: false,
