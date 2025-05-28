@@ -2,10 +2,20 @@ const EnrollActionStatus = require("../enum/enrollEnum");
 const EnrollmentModal = require("../model/enrollment.model");
 const SectionModal = require("../model/section.modal");
 const StudentModal = require("../model/student.modal");
+const cron = require("node-cron");
 
 const getEnrolllist = async (req, res) => {
   try {
-    const getdata = await EnrollmentModal.find();
+    const getdata = await EnrollmentModal.aggregate([
+     {
+      $project:{
+        enrollsectionList :1,
+        student_id : 1,
+        semester : 1,
+        createDate : 1,
+      }
+     }
+    ]);
     if (getdata.length === 0) {
       return res.status(404).json({ message: "Data not  found" });
     } else {
@@ -23,6 +33,7 @@ const createEnrollment = async (req, res) => {
     enrollData.student_id = reqBody.student_id;
     enrollData.enrollsectionList = [];
     enrollData.semester = reqBody.semester;
+    enrollData.createDate = new Date() ;
 
     await enrollData.save();
     res.status(200).json({ enrollData });
@@ -212,7 +223,6 @@ const addNewEnroll = async (req, res) => {
 //ถอนวิชาออก
 
 const withdrawOrDropSection = async (req, res) => {
-
   const { id } = req.params;
 
   const today = new Date();
@@ -275,8 +285,32 @@ const withdrawOrDropSection = async (req, res) => {
       });
     }
     res.status(200).json({
-      message: `Your are ${req.body.status.toLowerCase()} this section success!`
+      message: `Your are ${req.body.status.toLowerCase()} this section success!`,
     });
+  } catch (error) {
+    return res.status(500).json(error);
+  }
+};
+
+//ลบ enroll ที่ไม่มีการลงทะเบียน เป็นเวลา ... วัน หลังจากการสร้าง ตัว enroll นี้ เพื่อไม่ให้เปลื่อง memmory แบบ automation น่าจะลองใช้ middleware
+
+
+cron.schedule("*/20 * * * *", function (){ 
+  //ลบข้อมูลในแถวทุก 20 นาที
+  deleteEnrollment()
+});
+
+const deleteEnrollment = async (req, res) => {
+  //ทำการตรวจสอบว่า  enroll obj ไหนว่างบ้าง
+  // ถ้าเจอที่ว่าง ทำการตรวจสอบเวลาสร้าง ถ้า === 2 วัน ให้ทำการลบตัว obj ได้เลย
+  
+  try {
+    const getEnroll = await EnrollmentModal.find();
+    const emptyEnrollSection = getEnroll.filter((item) => {
+      return item.enrollsectionList.length === 0;
+    });
+    await Promise.all (emptyEnrollSection.map((item)=>EnrollmentModal.findByIdAndDelete(item._id)))
+    console.log("delete enroll when not enroll section")
   } catch (error) {
     return res.status(500).json(error);
   }
@@ -287,4 +321,5 @@ module.exports = {
   getEnrolllist,
   addNewEnroll,
   withdrawOrDropSection,
+  deleteEnrollment,
 };

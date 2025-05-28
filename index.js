@@ -44,6 +44,7 @@ app.use("/student", studentRoute);
 app.use("/major", MajorRoute);
 app.use("/authentication", UserRoute);
 app.use("/enrollment",EnrollRoute);
+
 //อนาคตจะทำการสร้างแบบ form service แลลกรอกหลายหน้า แล้วมีกาเก็บข้อมูลใน session เวลาย้อนกลับมาแล้วข้อมูลยังอยู่
 //api connect
 app.get("/", (req, res) => {
@@ -57,6 +58,8 @@ app.get("/downloadTextFile", (req, res) => {
     return res.status(404).json({ massage: "don't have file to download" });
   });
 });
+
+
 
 //connect zone
 connect().then(() => {
