@@ -102,16 +102,16 @@ const addNewEnroll = async (req, res) => {
       }
     }
     //ถ้าทำการถอยรายวิชานั้นแล้ว สามารถลงทะเบียน section ซ้ำได้ (section ทำการลบ สมาชิกออก)
-    const isWithDrawn = getDataFromId.enrollsectionList.some(
+    getDataFromId.enrollsectionList.some(
       (entry) =>
         entry.section_id.toString() === req.body.section_id &&
         entry.enrollmentStatus === EnrollActionStatus.WITHDRAW
     );
-    if (!isWithDrawn) {
-      return res
-        .status(400)
-        .json({ message: "You have already enrolled this section" });
-    }
+    // if (!isWithDrawn) {
+    //   return res
+    //     .status(400)
+    //     .json({ message: "You have already enrolled this section" });
+    // }
 
     //ทำการเพิ่มเข้าไปในช่อง enroll , section memberID , นำรหัส enroll ใน ข้อมูลนิสิตด้วย
     const addNewEnrollData = await EnrollmentModal.findByIdAndUpdate(
